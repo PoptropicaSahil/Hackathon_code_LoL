@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> -->
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Open Sans' rel="stylesheet">
+
+    <title>League of Legends Ranking</title>
+</head>
+<body>
+    
+    <!-- <div class="banner">
+        <img src="/static/LoL_background.png" alt="Banner Description">
+    </div> -->
+
+    <div class="banner"></div>
+    
+    <!-- Header text for the doc -->
+    <div class="header">
+        <h1>League of Legends Rankings Calculator</h1>
+        <p>Welcome to the LoL Rankings Calculator. Please select the Ranking Type, provide the necessary details, and click "Get Rankings" to see the results.</p>
+        <p>Project by: Sahil, Reshma and Melody!</p>
+    </div>
+
+
+
+
+
+    <div class="container">
+
+        <form action="/" method="post">
+
+
+            <!-- Toggle switch for Team Selection -->
+            <div class="toggle-switch">
+                <span>All teams over 2019-2023</span>
+                <label class="switch">
+                    <!-- <input type="checkbox" name="team_selection" id="teamToggle"> -->
+                    <!-- <input type="checkbox" id="teamToggle" name="msi_worlds_selection" class="checkbox"> -->
+                    <input type="checkbox" id="teamToggle" name="team_selection" class="checkbox">
+
+                    <span class="slider"></span>
+                </label>
+                <span>Only MSI/Worlds in 2023</span>
+            </div>
+
+
+            <label for="rankTypeDropdown">Select Ranking Type:</label> <!-- Dropdown Heading -->
+            <select name="rank_type" id="rankTypeDropdown">
+                <option value="global" {% if rank_type == 'global' %} selected {% endif %}>Global</option>
+                <option value="tournament" {% if rank_type == 'tournament' %} selected {% endif %}>Tournament</option>
+                <option value="team" {% if rank_type == 'team' %} selected {% endif %}>Team</option>
+            </select>
+
+            <!-- Tournament ID input -->
+            <div id="tournamentIdDiv" style="display: none;">
+                <label for="tournamentId">Tournament ID:</label>
+                <!-- <input type="number" name="tournament_id" id="tournamentId" value="{{ tournament_id or '' }}"> -->
+                <input type="number" name="tournament_id" id="tournamentId">
+            </div>
+
+            <!-- Team IDs input -->
+            <div id="teamIdsDiv" style="display: none;">
+                <label for="teamIds">Team IDs (comma-separated):</label>
+                <!-- <input type="text" name="team_ids" id="teamIds" value="{{ team_ids or '' }}"> -->
+                <input type="text" name="team_ids" id="teamIds">
+
+            </div>
+
+            <!-- <input type="date" name="date" placeholder="Optional End Date till when rankings to be observed" value="{{ date }}"> -->
+            <label for="date"> (Optional) End Date till when rankings to be observed:</label> <!-- Dropdown Heading -->
+            <input type="date" name="date" placeholder="Optional End Date till when rankings to be observed">
+
+            <button type="button" id="resetButton">Reset</button>  <!-- Reset button -->
+            <button type="submit" class="elegant-button">Get Rankings</button>  
+         
+
+            </form>
+        </form>
+
+        <!-- Display the error message here -->
+
+        {% if log_messages %}
+        <div class="log-container">
+            <h4 class="log-heading">Logs</h4>  <!-- New heading for logs -->
+            {% for message in log_messages %}
+            <div class="log-message">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        {% if rankings_error %}
+        <div class="error-message">
+            {{ rankings_error }}
+        </div>
+        {% endif %}
+
+
+
+        
+        {% if data %}
+        <table>
+            <thead>
+                <tr>
+                    {% for column in data[0].keys() %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    {% for column in data[0].keys() %}
+                    <td>{{ row[column] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <script>
+        const rankTypeDropdown = document.getElementById('rankTypeDropdown');
+        const tournamentIdDiv = document.getElementById('tournamentIdDiv');
+        const teamIdsDiv = document.getElementById('teamIdsDiv');
+
+        rankTypeDropdown.addEventListener('change', function() {
+            if (rankTypeDropdown.value === 'tournament') {
+                tournamentIdDiv.style.display = 'block';
+                teamIdsDiv.style.display = 'none';
+            } else if (rankTypeDropdown.value === 'team') {
+                teamIdsDiv.style.display = 'block';
+                tournamentIdDiv.style.display = 'none';
+            } else {
+                tournamentIdDiv.style.display = 'none';
+                teamIdsDiv.style.display = 'none';
+            }
+        });
+
+        // Show the appropriate ID field if 'tournament' or 'team' is selected by default
+        if (rankTypeDropdown.value === 'tournament') {
+            tournamentIdDiv.style.display = 'block';
+        } else if (rankTypeDropdown.value === 'team') {
+            teamIdsDiv.style.display = 'block';
+        }
+
+
+        // Handle the reset button click
+
+        const resetButton = document.getElementById('resetButton');
+        const teamToggle = document.getElementById('teamToggle');
+        resetButton.addEventListener('click', function() {
+            // Reset the form
+            document.querySelector('form').reset();
+            
+            // Hide the results table (if it's being displayed)
+            const table = document.querySelector('table');
+            if (table) {
+                table.style.display = 'none';
+            }
+
+            // Reset the dropdown-triggered input fields to their default hidden state
+            document.getElementById('tournamentIdDiv').style.display = 'none';
+            document.getElementById('teamIdsDiv').style.display = 'none';
+            
+            // Clear any error messages
+            const errorMessageElements = document.querySelectorAll('.error-message');
+            errorMessageElements.forEach(element => element.textContent = '');
+
+            // Clear log messages
+            const logContainer = document.querySelector('.log-container');
+            if (logContainer) {
+                logContainer.innerHTML = '';  // This will remove all child elements and text inside the log container
+            }
+
+            // Reset the toggle switch
+            teamToggle.checked = false;
+
+        });
+
+    
+
+    </script>
+
+    <div class="bottom-spacer"></div>
+</body>
+</html>

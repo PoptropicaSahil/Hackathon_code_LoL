@@ -1,0 +1,11 @@
+
+cd helloworld
+source venv/bin/activate
+
+
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl restart nginx
+
+
+sudo systemctl start nginx;sudo systemctl enable nginx;sudo systemctl restart nginx
