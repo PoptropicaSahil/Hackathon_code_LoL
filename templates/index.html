@@ -141,12 +141,19 @@
             if (rankTypeDropdown.value === 'tournament') {
                 tournamentIdDiv.style.display = 'block';
                 teamIdsDiv.style.display = 'none';
+                tournamentIdDiv.querySelector('input').classList.remove('hidden');   // added this line
+                teamIdsDiv.querySelector('input').classList.add('hidden');
             } else if (rankTypeDropdown.value === 'team') {
                 teamIdsDiv.style.display = 'block';
                 tournamentIdDiv.style.display = 'none';
+                teamIdsDiv.querySelector('input').classList.remove('hidden');       // added this line
+                tournamentIdDiv.querySelector('input').classList.add('hidden'); // added this line
             } else {
                 tournamentIdDiv.style.display = 'none';
                 teamIdsDiv.style.display = 'none';
+                tournamentIdDiv.querySelector('input').classList.add('shown'); // added this line
+                teamIdsDiv.querySelector('input').classList.add('shown');     // added this line
+
             }
         });
 
@@ -194,6 +201,13 @@
     
 
     </script>
+
+    <script>
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
+    </script>
+
 
     <div class="bottom-spacer"></div>
 </body>

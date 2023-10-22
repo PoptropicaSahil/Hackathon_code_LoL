@@ -68,7 +68,15 @@ html, body {
 body {
     /* ... existing styles ... */
     margin-bottom: 50px; /* or any desired value */
+    opacity: 0;
+    transition: opacity 1s ease-out;
 }
+
+
+body.loaded {
+    opacity: 1;
+}
+
 
 .bottom-spacer {
     height: 50px;  /* adjust this value to increase or decrease the gap */
@@ -101,6 +109,25 @@ body {
     /* Alternatively, use padding to control the size */
     /* padding: 5px 15px; */
 }
+
+button:hover {
+    transform: scale(1.05);  /* Grows the button slightly */
+    /* background-color: #c1e66b86; Change to any color you like */
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.log-container {
+    animation: 1s ease-out 0s 1 slideInFromRight;
+}
+
 
 .log-container {
     /* margin-top: 20px;
@@ -139,7 +166,23 @@ body {
     display: inline-block;
     width: 60px;
     height: 34px;
+    transition: all 0.5s; 
 }
+
+select, input {
+    /* opacity: 0; */
+    transition: opacity 0.5s ease-out;
+}
+
+select.shown, input.shown {
+    opacity: 1;
+}
+
+select.hidden, input.hidden {
+    opacity: 0;
+}
+
+
 
 .toggle-switch {
     font-family: 'Open Sans', sans-serif;
